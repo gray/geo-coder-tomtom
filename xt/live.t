@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use Encode;
 use Geo::Coder::TomTom;
-use LWP::UserAgent;
 use Test::More;
 
 plan tests => 9;
