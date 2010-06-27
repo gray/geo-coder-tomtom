@@ -162,8 +162,6 @@ Accessor for the UserAgent object.
 
 =head1 SEE ALSO
 
-L<http://wiki.openstreetmap.org/wiki/Nominatim>
-
 L<Geo::Coder::Bing>, L<Geo::Coder::Google>, L<Geo::Coder::Mapquest>,
 L<Geo::Coder::Multimap>, L<Geo::Coder::OSM>, L<Geo::Coder::Yahoo>
 
