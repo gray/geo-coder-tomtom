@@ -128,23 +128,23 @@ list context it returns all location results.
 
 Each location result is a hashref; a typical example looks like:
 
-{
-    category         => 7373,
-    city             => "Hollywood",
-    country          => "United States",
-    countryISO3      => "USA",
-    formattedAddress => "Hollywood & Highland, Hollywood, CA, US",
-    geohash          => "9q5cgpgrfetr",
-    heightMeters     => 0,
-    latitude         => "34.10154",
-    longitude        => "-118.34015",
-    mapName          => "usacanadaandmexicop",
-    name             => "Hollywood & Highland",
-    score            => 1,
-    state            => "CA",
-    type             => "poi",
-    widthMeters      => 0,
-}
+    {
+        category         => 7373,
+        city             => "Hollywood",
+        country          => "United States",
+        countryISO3      => "USA",
+        formattedAddress => "Hollywood & Highland, Hollywood, CA, US",
+        geohash          => "9q5cgpgrfetr",
+        heightMeters     => 0,
+        latitude         => "34.10154",
+        longitude        => "-118.34015",
+        mapName          => "usacanadaandmexicop",
+        name             => "Hollywood & Highland",
+        score            => 1,
+        state            => "CA",
+        type             => "poi",
+        widthMeters      => 0,
+    }
 
 =head2 response
 
