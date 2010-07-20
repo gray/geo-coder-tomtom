@@ -1,4 +1,8 @@
 Revision history for Geo-Coder-TomTom
 
+0.02  Tue Jul 20 23:37:13 UTC 2010
+    - Properly formatted the hashref in the Pod.
+    - Corrected "See Also" link to TomTom's site.
+
 0.01  Sun Jun 27 03:35:42 UTC 2010
     - Initial distribution.
