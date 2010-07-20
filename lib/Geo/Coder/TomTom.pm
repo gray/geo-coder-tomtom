@@ -3,7 +3,7 @@ package Geo::Coder::TomTom;
 use strict;
 use warnings;
 
-use Carp qw(carp croak);
+use Carp qw(croak);
 use JSON;
 use LWP::UserAgent;
 use URI;
@@ -166,7 +166,7 @@ L<http://routes.tomtom.com/>
 
 L<Geo::Coder::Bing>, L<Geo::Coder::Bing::Bulk>, L<Geo::Coder::Google>,
 L<Geo::Coder::Mapquest>, L<Geo::Coder::Multimap>, L<Geo::Coder::Navteq>,
-L<Geo::Coder::OSM>, L<Geo::Coder::Yahoo>
+L<Geo::Coder::OSM>, L<Geo::Coder::PlaceFinder>, L<Geo::Coder::Yahoo>
 
 =head1 REQUESTS AND BUGS
 
