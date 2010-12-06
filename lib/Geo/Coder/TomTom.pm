@@ -203,7 +203,7 @@ L<http://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-TomTom>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Geo-Coder-TomTom>
+L<http://search.cpan.org/dist/Geo-Coder-TomTom/>
 
 =back
 
