@@ -18,7 +18,7 @@ sub new {
 
     my $self = bless \ %params, $class;
 
-    $self->{apikey} ||= '55849048-cbd2-4bfc-a7b4-83acbebecf3d';
+    $self->{apikey} ||= '1e2099c7-eea9-476b-aac9-b20dc7100af1';
 
     if ($params{ua}) {
         $self->ua($params{ua});
