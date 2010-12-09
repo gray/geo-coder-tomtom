@@ -79,7 +79,10 @@ sub geocode {
     my $data = eval { from_json($content) };
     return unless $data;
 
-    my @results = @{$data->{geoResponse}{geoResult} || []};
+    # Result is a list only if there is more than one item.
+    my $results = $data->{geoResponse}{geoResult};
+    my @results = 'ARRAY' eq ref $results ? @$results : ($results);
+
     return wantarray ? @results : $results[0];
 }
 
