@@ -12,14 +12,15 @@ unless ($debug) {
 }
 
 my $geocoder = Geo::Coder::TomTom->new(
-    debug => $debug
+    debug    => $debug,
+    compress => 0,
 );
 {
     my $address = 'Hollywood & Highland, Los Angeles, CA';
     my $location = $geocoder->geocode($address);
     is(
         $location->{city},
-        'Hollywood',  # huh?!
+        'Los Angeles',
         "correct city for $address"
     );
 }
