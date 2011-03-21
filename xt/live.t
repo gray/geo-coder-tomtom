@@ -38,14 +38,13 @@ my $geocoder = Geo::Coder::TomTom->new(
     ok($location, 'UTF-8 bytes');
     is($location->{country}, 'Germany', 'UTF-8 bytes');
     is($location->{houseNumber}, 6, 'UTF-8 bytes: parsed street address');
-}
-{
-    my $city = decode('latin1', qq(Schm\xF6ckwitz));
-    my $location = $geocoder->geocode("$city, Berlin, Germany");
+
+    my $city = decode('latin1', qq(M\xFCnster));
     is(
-        $location->{district}, $city,
+        $location->{city}, $city,
         'decoded character encoding of response'
     );
+
 }
 
 done_testing;
