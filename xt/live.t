@@ -4,12 +4,9 @@ use Encode;
 use Geo::Coder::TomTom;
 use Test::More;
 
-plan tests => 9;
-
 my $debug = $ENV{GEO_CODER_TOMTOM_DEBUG};
-unless ($debug) {
-    diag "Set GEO_CODER_TOMTOM_DEBUG to see request/response data";
-}
+diag "Set GEO_CODER_TOMTOM_DEBUG to see request/response data"
+    unless $debug;
 
 my $geocoder = Geo::Coder::TomTom->new(
     debug    => $debug,
@@ -40,13 +37,7 @@ my $geocoder = Geo::Coder::TomTom->new(
     );
     ok($location, 'UTF-8 bytes');
     is($location->{country}, 'Germany', 'UTF-8 bytes');
-    TODO: {
-        local $TODO = 'UTF-8 bytes';
-        isnt(
-            $location->{type}, 'postcode',
-            q(doesn't parse street address)
-        );
-    }
+    is($location->{houseNumber}, 6, 'UTF-8 bytes: parsed street address');
 }
 {
     my $city = decode('latin1', qq(Schm\xF6ckwitz));
@@ -56,3 +47,5 @@ my $geocoder = Geo::Coder::TomTom->new(
         'decoded character encoding of response'
     );
 }
+
+done_testing;
