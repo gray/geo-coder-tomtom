@@ -18,7 +18,7 @@ sub new {
 
     my $self = bless \ %params, $class;
 
-    $self->{apikey} ||= '1e2099c7-eea9-476b-aac9-b20dc7100af1';
+    $self->{apikey} ||= '4er4u6rjnb8jf5q4697d9rrq';
 
     $self->ua(
         $params{ua} || LWP::UserAgent->new(agent => "$class/$VERSION")
@@ -53,15 +53,20 @@ sub geocode {
     my %params = (@params % 2) ? (location => @params) : @params;
 
     my $location = $params{location} or return;
+    $params{query}  = delete $params{location}; 
+    ($params{apikey} ? $params{key} = delete $params{apikey} :  $params{key} =  $self->{apikey});
+    $params{format} = 'json';
 
-    my $uri = URI->new('http://routes.tomtom.com');
+    my $uri = URI->new('http://api.tomtom.com');
     $uri->path(
-        '/lbs/services/geocode/1/query/' . uri_escape_utf8($location) .
-        '/json/' . $self->{apikey} . ';language=en;map=basic'
+        '/lbs/services/geocode/4/geocode'
     );
 
+    $uri->query_form(
+        %params,
+    );
     my $res = $self->{response} = $self->ua->get(
-        $uri, referer => 'http://routes.tomtom.com/'
+        $uri,referer => 'http://api.tomtom.com/'
     );
     return unless $res->is_success;
 
@@ -71,7 +76,7 @@ sub geocode {
 
     my $content = $res->decoded_content;
     return unless $content;
-
+    
     my $data = eval { from_json($content) };
     return unless $data;
 
