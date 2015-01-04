@@ -1,4 +1,6 @@
 Geo-Coder-TomTom-*
+MANIFEST.bak
+MYMETA.*
 Makefile
 Makefile.old
 blib/
