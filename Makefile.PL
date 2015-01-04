@@ -9,25 +9,23 @@ my %conf = (
     VERSION_FROM   => 'lib/Geo/Coder/TomTom.pm',
     ABSTRACT_FROM  => 'lib/Geo/Coder/TomTom.pm',
     PREREQ_PM      => {
+        'Encode'         => 0,
         'JSON'           => 2.0,
         'LWP::UserAgent' => 0,
         'URI'            => 1.36,
-        'URI::Escape'    => 0,
     },
-    BUILD_REQUIRES => {
-        'Encode'     => 0,
-        'Test::More' => 0.82,
-    },
+    BUILD_REQUIRES => { 'Test::More' => 0.82, },
     META_MERGE     => {
         resources  => {
             repository => 'http://github.com/gray/geo-coder-tomtom',
         },
         recommends => {
-            'JSON::XS' => 2.0,
+            'JSON::XS'             => 2.0,
+            'LWP::Protocol::https' => 6.02,
         },
     },
-    dist           => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean          => { FILES => 'Geo-Coder-TomTom-*' },
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean => { FILES => 'Geo-Coder-TomTom-*' },
 );
 
 my $eumm_version=$ExtUtils::MakeMaker::VERSION;

@@ -4,10 +4,10 @@ use strict;
 use warnings;
 
 use Carp qw(croak);
+use Encode ();
 use JSON;
 use LWP::UserAgent;
 use URI;
-use URI::Escape qw(uri_escape_utf8);
 
 our $VERSION = '0.03';
 $VERSION = eval $VERSION;
@@ -16,9 +16,9 @@ sub new {
     my ($class, @params) = @_;
     my %params = (@params % 2) ? (apikey => @params) : @params;
 
-    my $self = bless \ %params, $class;
+    croak q('apikey' is required) unless exists $params{apikey};
 
-    $self->{apikey} ||= '1e2099c7-eea9-476b-aac9-b20dc7100af1';
+    my $self = bless \ %params, $class;
 
     $self->ua(
         $params{ua} || LWP::UserAgent->new(agent => "$class/$VERSION")
@@ -28,10 +28,14 @@ sub new {
         my $dump_sub = sub { $_[0]->dump(maxlength => 0); return };
         $self->ua->set_my_handler(request_send  => $dump_sub);
         $self->ua->set_my_handler(response_done => $dump_sub);
+        $self->{compress} ||= 0;
     }
-    elsif (exists $self->{compress} ? $self->{compress} : 1) {
+    if (exists $self->{compress} ? $self->{compress} : 1) {
         $self->ua->default_header(accept_encoding => 'gzip,deflate');
     }
+
+    croak q('https' requires LWP::Protocol::https)
+        if $self->{https} and not $self->ua->is_protocol_supported('https');
 
     return $self;
 }
@@ -52,17 +56,18 @@ sub geocode {
     my ($self, @params) = @_;
     my %params = (@params % 2) ? (location => @params) : @params;
 
-    my $location = $params{location} or return;
+    $params{query} = delete $params{location} or return;
+    $_ = Encode::encode('utf-8', $_) for values %params;
 
-    my $uri = URI->new('http://routes.tomtom.com');
-    $uri->path(
-        '/lbs/services/geocode/1/query/' . uri_escape_utf8($location) .
-        '/json/' . $self->{apikey} . ';language=en;map=basic'
+    my $uri = URI->new('https://api.tomtom.com/lbs/services/geocode/4/geocode');
+    $uri->scheme('https') if $self->{https};
+    $uri->query_form(
+        key    => $self->{apikey},
+        format => 'json',
+        %params,
     );
 
-    my $res = $self->{response} = $self->ua->get(
-        $uri, referer => 'http://routes.tomtom.com/'
-    );
+    my $res = $self->{response} = $self->ua->get($uri);
     return unless $res->is_success;
 
     # Change the content type of the response from 'application/json' so
@@ -89,33 +94,58 @@ __END__
 
 =head1 NAME
 
-Geo::Coder::TomTom - Geocode addresses with the TomTom route planner
+Geo::Coder::TomTom - Geocode addresses with the TomTom Map Toolkit API
 
 =head1 SYNOPSIS
 
     use Geo::Coder::TomTom;
 
-    my $geocoder = Geo::Coder::TomTom->new;
+    my $geocoder = Geo::Coder::TomTom->new(apikey => 'Your API key');
     my $location = $geocoder->geocode(
-        location => 'Hollywood and Highland, Los Angeles, CA'
+        location => 'De Ruijterkade 154, Amsterdam, NL'
     );
 
 =head1 DESCRIPTION
 
-The C<Geo::Coder::TomTom> module provides an interface to the geocoding
-service of the TomTom route planner through the unofficial (as-yet
-unpublished) REST API.
+The C<Geo::Coder::TomTom> module provides an interface to the TomTom Map
+Toolkit geocoding service.
 
 =head1 METHODS
 
 =head2 new
 
-    $geocoder = Geo::Coder::TomTom->new();
+    $geocoder = Geo::Coder::TomTom->new('Your API key')
+    $geocoder = Geo::Coder::TomTom->new(
+        apikey => 'Your API key',
+        # debug => 1,
+    )
 
 Creates a new geocoding object.
 
-Accepts an optional B<ua> parameter for passing in a custom LWP::UserAgent
-object.
+Accepts the following named arguments:
+
+=over
+
+=item * I<apikey>
+
+An API key (required)
+
+An API key can be obtained here: L<http://developer.tomtom.com/apps/mykeys>
+
+=item * I<ua>
+
+A custom LWP::UserAgent object. (optional)
+
+=item * I<compress>
+
+Enable compression. (default: 1, unless I<debug> is enabled)
+
+=item * I<debug>
+
+Enable debugging. This prints the headers and content for requests and
+responses. (default: 0)
+
+=back
 
 =head2 geocode
 
@@ -128,22 +158,27 @@ list context it returns all location results.
 Each location result is a hashref; a typical example looks like:
 
     {
-        category         => 7373,
-        city             => "Hollywood",
-        country          => "United States",
-        countryISO3      => "USA",
-        formattedAddress => "Hollywood & Highland, Hollywood, CA, US",
-        geohash          => "9q5cgpgrfetr",
-        heightMeters     => 0,
-        latitude         => "34.10154",
-        longitude        => "-118.34015",
-        mapName          => "usacanadaandmexicop",
-        name             => "Hollywood & Highland",
-        score            => 1,
-        state            => "CA",
-        type             => "poi",
-        widthMeters      => 0,
-    }
+        "latitude": 52.3773852,
+        "longitude": 4.9094794,
+        "geohash": "u173zxnbrhm0",
+        "mapName": "TomTomMap",
+        "houseNumber": "154",
+        "type": "house",
+        "street": "De Ruijterkade",
+        "alternativeStreetName": [],
+        "city": "Amsterdam",
+        "district": "Amsterdam",
+        "country": "The Netherlands",
+        "countryISO3": "NLD",
+        "postcode": "1011 AC",
+        "formattedAddress": "De Ruijterkade 154, 1011 AC Amsterdam, Amsterdam, NL",
+        "isCensusMicropolitanFlag": false,
+        "widthMeters": 1,
+        "heightMeters": 1,
+        "score": 1.0,
+        "confidence": 0.40665394,
+        "iteration": 0
+    },
 
 =head2 response
 
@@ -161,7 +196,7 @@ Accessor for the UserAgent object.
 
 =head1 SEE ALSO
 
-L<http://routes.tomtom.com/>
+L<http://developer.tomtom.com/docs/read/map_toolkit/web_services/geocoding_single_call>
 
 =head1 REQUESTS AND BUGS
 
@@ -204,7 +239,7 @@ L<http://search.cpan.org/dist/Geo-Coder-TomTom/>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010 gray <gray at cpan.org>, all rights reserved.
+Copyright (C) 2010-2015 gray <gray at cpan.org>, all rights reserved.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
